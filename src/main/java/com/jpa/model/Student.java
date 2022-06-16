@@ -1,6 +1,5 @@
 package com.jpa.model;
 
-import jdk.dynalink.linker.LinkerServices;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,15 +14,21 @@ import java.util.List;
 public class Student {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long studentId;
     private String name;
     private String rollno;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
     @JoinTable(
             name = "stud_courses",
             joinColumns = @JoinColumn(name = "studentId"),
             inverseJoinColumns = @JoinColumn(name = "courseId")
     )
-    private List<Course> course;
+    private List<Course> courses;
+
+    public void addCourse(Course course){
+        this.courses.add(course);
+        course.getStudent().add(this);
+    }
 }
